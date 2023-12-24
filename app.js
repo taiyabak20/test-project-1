@@ -8,9 +8,12 @@ const playersRoutes = require('./routes/routes')
 
 app.use(cors())
 app.use(express.json())
-app.use('/', playersRoutes)
+app.use('/players', playersRoutes)
 
-sequelize.sync().then(result => {
+sequelize
+.sync()
+//.sync({force: true})
+.then(result => {
     //console.log(result)
     app.listen(port, ()=> {
         console.log('running the app on port '+ port)
