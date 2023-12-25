@@ -1,3 +1,5 @@
+const Sequelize = require('sequelize')
+const sequelize = require('../db');
 const players = require('../models/models')
 
 exports.postPlayers = (req, res)=>{
@@ -33,19 +35,36 @@ exports.postPlayers = (req, res)=>{
     .catch(err => console.log(err))
     
 }
+exports.getAllByName = (req, res) => {
+    const name = req.params.name;
+
+    players.findAll({
+        where: {
+            name: {
+                [Sequelize.Op.like]: `%${name}%`
+            }
+        },
+        attributes: ["id", "name", "dateOfBirth", "photoUrl", "Birthplace", "Career", "NumberOfMatches", "Score", "Fifties", "Centuries", "Wickets", "Average"]
+    })
+        .then(data => {
+            return res.json({ data });
+        })
+        .catch(err => console.log(err));
+};
 
 exports.getOne = (req, res) => {
     const name = req.params.name;
 
-    players.findOne({
-        where: { name : name },
-         attributes: ["id", "name", "dateOfBirth", "photoUrl", "Birthplace", "Career", "NumberOfMatches", "Score" ,"Fifties", "Centuries", "Wickets", "Average"]
+    players.findAll({
+        where: { name: name },
+        attributes: ["id", "name", "dateOfBirth", "photoUrl", "Birthplace", "Career", "NumberOfMatches", "Score", "Fifties", "Centuries", "Wickets", "Average"]
     })
-    .then(data => {
-        return res.json({ data });
-    })
-    .catch(err => console.log(err));
+        .then(data => {
+            return res.json({ data });
+        })
+        .catch(err => console.log(err));
 };
+
 
 exports.editPlayer = (req, res)=>{
     const id = req.params.id;

@@ -70,6 +70,8 @@ let id =null;
     
 function showData(player)
 {
+    const career = player.Career
+    const careerWithBr = career.replace(/\n/g, '<br>');
     document.querySelector('.searchedDetails').innerHTML =
     ` 
     <button class="editBtn">Edit Player</button>
@@ -86,25 +88,16 @@ function showData(player)
     <p id="Avg">Avg: ${player.Average}</p>
     <p id="Wickets">Wickets: ${player.Wickets}</p></b>
   
-    <p id="userDOB">${player.Career}</p>
+    <p id="userDOB">${careerWithBr}</p>
 
-` }
+`
+const editBtn = document.querySelector('.editBtn');
 
-async function searchFunc(e){
+
+editBtn.addEventListener('click', (e) => {
     e.preventDefault();
 
-const searchedName = document.querySelector('#searchedName').value;
-
-    getOne = async () => {
-        const res = await axios.get(`${url}/${searchedName}`);
-        let player = res.data.data
-        if (player){
-    showData(player)
-    const editBtn = document.querySelector('.editBtn')
-
-editBtn.addEventListener('click', async(e) =>{
-    e.preventDefault();
-
+    
     document.querySelector('#name').value = player.name;
     document.querySelector('#dob').value = player.dateOfBirth;
     document.querySelector('#photo').value = player.photoUrl;
@@ -116,12 +109,46 @@ editBtn.addEventListener('click', async(e) =>{
     document.querySelector('#centuries').value = player.Centuries;
     document.querySelector('#wickets').value = player.Wickets;
     document.querySelector('#average').value = player.Average;
-    id=player.id
+
+    id = player.id;
+}) }
+
+async function searchFunc(e) {
+    e.preventDefault();
+
+    const searchedName = document.querySelector('#searchedName').value;
+    document.querySelector('.searchedDetails').innerHTML =""
+    try {
+        const response = await axios.get(`${url}/${searchedName}`);
+        const players = response.data.data;
+        if (players.length>0) {
+        players.forEach(player =>{
+            console.log(player);
+            
+            document.querySelector('.searchedDetails').innerHTML += `<h2>${player.name}</h2>
+            <button class="detailsBtn" id="${player.name}">Show Details</button>`
+            const detailsBtns = document.querySelectorAll('.detailsBtn')
+detailsBtns.forEach(detailsBtn=>{
+    detailsBtn.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        const id = detailsBtn.getAttribute('id');
+        const players = await axios.get(`${url}/player/${id}`);
+        const player = players.data.data
+        console.log(id)
+        showData(player[0]);
+    })
 })
+    
     }
-else {
-    document.querySelector('.searchedDetails').innerHTML = `<h1>Data not available!</h1>`
-}}
-    getOne()
-    document.querySelector('#searchedName').value= "";
+        )}
+             else {
+                document.querySelector('.searchedDetails').innerHTML = `<h1>Data not available!</h1>`;
+            }
+        
+
+    } catch (error) {
+        console.error('Error fetching player data:', error.message);
+    }
+
+    document.querySelector('#searchedName').value = '';
 }

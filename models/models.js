@@ -24,7 +24,7 @@ const players = sequelize.define('players', {
         allowNull: false
     },
     Career: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false
     },
     NumberOfMatches: {
